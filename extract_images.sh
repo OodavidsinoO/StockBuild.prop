@@ -22,7 +22,7 @@ for file in ./dl/*; do                                      # Iterate through fi
 		extraction_start=$(date +%s)
 
 		# Extract images
-		if unzip -l "$file" | grep -q "payload.bin"; then
+		if unzip -l "$file" | grep -qE '(^| )payload\.bin$'; then
 			print_message "Extracting OTA image…" debug
 
 			# Skip image if it failed to get extracted
@@ -80,7 +80,7 @@ if [ -d "$EAI_BP" ]; then
 					# Skip image if it failed to get extracted
 					if ! payload_dumper "$file" --partitions="$partitionsArgs" --out="$EI_BP/$basename" 2>/dev/null; then
 						print_message "Failed to extract $file using Android OTA Dumper. Skipping…\n" warning
-						rm -rf "$EI_BP/$basename" # TODO: Use "${var:?}" to ensure this never expands to / .
+						[ -n "$basename" ] && rm -rf "$EI_BP/$basename"
 						continue
 					fi
 				else # Else directly extract all the required image using 7z
@@ -90,7 +90,7 @@ if [ -d "$EAI_BP" ]; then
 						# Skip image if it failed to get extracted
 						if ! 7z e "$file" -o"$EI_BP/$basename" "$image_name.img" -r &>/dev/null; then
 							print_message "Failed to extract $image_name.img from $file using 7z. Skipping…\n" warning
-							rm -rf "$EI_BP/$basename/$image_name.img"
+							[ -n "$basename" ] && rm -rf "$EI_BP/$basename/$image_name.img"
 							continue
 						fi
 					done

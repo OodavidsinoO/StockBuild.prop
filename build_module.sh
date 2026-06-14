@@ -13,7 +13,7 @@ base_name=$(basename "$dir")
 declare EXT_PROP_FILES=$(find_prop_files "$dir")
 
 # Store the content of all prop files in a variable
-declare EXT_PROP_CONTENT=$(cat $EXT_PROP_FILES)
+declare EXT_PROP_CONTENT=$(cat -- $EXT_PROP_FILES)
 
 # Save module device information
 device_name=$(grep_prop "ro.product.model" "$EXT_PROP_CONTENT")

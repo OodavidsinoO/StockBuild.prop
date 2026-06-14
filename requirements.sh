@@ -20,7 +20,7 @@ python3 -m pip -V &>/dev/null || print_message "Could not find pip module in pyt
 payload_dumper -h &>/dev/null || print_message "Could not find payload_dumper executable. Install it using python3 -m pip install git+https://github.com/5ec1cff/payload-dumper" error
 
 # Install imjtool if not already installed
-while [ ! -f "./imjtool" ]; do
+if [ ! -f "./imjtool" ]; then
 	print_message "./imjtool not found. Installing imjtool…" info
-	aria2c "http://newandroidbook.com/tools/imjtool"
-done
+	aria2c --allow-overwrite=true -o imjtool "http://newandroidbook.com/tools/imjtool" || print_message "Failed to download imjtool" warning
+fi
