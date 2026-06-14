@@ -7,17 +7,18 @@ Two independent build flows, same module output format:
 | Flow | Trigger | Download | Release tag |
 |------|---------|----------|-------------|
 | **Pixel** | Scheduled (7th monthly) + manual | Scrapes Google OTA pages (`download_latest_ota_build.sh`) | `YYYYMMDD` |
-| **Stock** | Manual only (`workflow_dispatch`) | Arbitrary URL (`download_ota_from_url.sh`) | `codename-YYYYMMDD` |
+| **Stock** | Manual only (`workflow_dispatch`) | Arbitrary URL (`download_ota_from_url.sh`) | `codename-YYYYMMDD` | Codename auto-detected from OTA metadata (`pre-device`) if not provided |
 
 Both flows converge at `extract_images.sh` which orchestrates: download → extract payload.bin → dump partitions → build props → build module ZIP.
 
 ## Commands
 
 ```bash
-# Local: build from any OTA URL (one step)
-./build_from_url.sh <URL> <codename> [device_name]
+# Local: build from any OTA URL (one step, codename auto-detected)
+./build_from_url.sh <URL> [codename] [device_name]
 
-# Local: Pixel OTA download (requires scraping Google)
+# Local: just download OTA (codename auto-detected if not given)
+./download_ota_from_url.sh <URL> [codename]     # writes resolved codename to ./dl/.codename
 ./download_latest_ota_build.sh <device>          # e.g. husky felix_beta
 
 # Extract + build everything in ./dl/

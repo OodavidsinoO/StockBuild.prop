@@ -3,13 +3,13 @@ name: Build from OTA URL
 on:
   workflow_dispatch:
     inputs:
-      device_codename:
-        description: 'Device codename (e.g., fuxi, kebab, pacman)'
-        required: true
-        type: string
       ota_url:
         description: 'Direct URL to OTA ZIP file'
         required: true
+        type: string
+      device_codename:
+        description: 'Device codename (leave empty to auto-detect from OTA)'
+        required: false
         type: string
       device_name:
         description: 'Friendly device name (optional, e.g., Xiaomi 13)'
@@ -40,8 +40,11 @@ jobs:
       - name: Make all scripts executable
         run: chmod +x *.sh
 
-      - name: Download OTA for ${{ inputs.device_codename }}
-        run: ./download_ota_from_url.sh "${{ inputs.ota_url }}" "${{ inputs.device_codename }}"
+      - name: Download OTA
+        id: download
+        run: |
+          ./download_ota_from_url.sh "${{ inputs.ota_url }}" "${{ inputs.device_codename }}"
+          echo "codename=$(cat ./dl/.codename)" >> "$GITHUB_OUTPUT"
 
       - name: Extract images and build
         id: extract_and_build
@@ -50,7 +53,7 @@ jobs:
       - name: Determine release tag
         id: get_tag
         run: |
-          echo "tag=${{ inputs.device_codename }}-$(date '+%Y%m%d')" >> "$GITHUB_OUTPUT"
+          echo "tag=${{ steps.download.outputs.codename }}-$(date '+%Y%m%d')" >> "$GITHUB_OUTPUT"
 
       - name: Create release and upload asset
         env:
@@ -58,6 +61,9 @@ jobs:
         run: |
           TAG="${{ steps.get_tag.outputs.tag }}"
           MODULE_FILE="${{ steps.extract_and_build.outputs.module_base_name }}.zip"
+          TITLE_CODENAME="${{ steps.download.outputs.codename }}"
+          TITLE_NAME="${{ inputs.device_name }}"
+          [ -z "$TITLE_NAME" ] && TITLE_NAME="$TITLE_CODENAME"
 
           echo "## ${{ steps.extract_and_build.outputs.device_name }} (${{ steps.extract_and_build.outputs.device_codename }})" > .release_body
           echo "#### Module" >> .release_body
@@ -69,7 +75,7 @@ jobs:
           echo "- Security Patch: \`${{ steps.extract_and_build.outputs.device_build_security_patch }}\`" >> .release_body
 
           gh release create "$TAG" "$MODULE_FILE" \
-            --title "${{ inputs.device_codename }} (${{ inputs.device_name }}) - $(date '+%Y-%m-%d')" \
+            --title "$TITLE_CODENAME ($TITLE_NAME) - $(date '+%Y-%m-%d')" \
             --notes-file .release_body \
             --prerelease=false \
             || gh release upload "$TAG" "$MODULE_FILE" --clobber
