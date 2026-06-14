@@ -109,4 +109,4 @@ checksum_sha256
 [ -f "$MODPATH/service.sh" ] && busybox sh "$MODPATH"/service.sh 2>&1
 
 # Print footer message
-ui_print "- Script by Tesla, Telegram: @T3SL4 | t.me/PixelProps"
+ui_print "- Script by OodavidsinoO, based on work by Tesla | t.me/PixelProps"

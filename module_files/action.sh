@@ -231,7 +231,7 @@ PlayIntegrityFix() {
       ui_print "  ? Please disconnect your device from your Google account: https://myaccount.google.com/device-activity"
       ui_print "  ? Clean the data from Google system apps such as GMS, GSF, and Google apps."
       ui_print "  ? Then restart and make sure to reconnect to your device, Make sure if your device is logged as \"$MODEL\"."
-      ui_print "  ? More info: https://t.me/PixelProps/157"
+      ui_print "  ? More info: https://t.me/PixelProps/157 (by Tesla)"
       ui_print "***************************************"
     fi
   fi

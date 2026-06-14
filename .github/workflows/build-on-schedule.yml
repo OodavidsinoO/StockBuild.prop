@@ -41,8 +41,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install APT packages
         run: |
@@ -55,7 +53,7 @@ jobs:
           echo PATH=$PATH >> "$GITHUB_ENV"
 
       - name: Install payload_dumper
-        run: pip install ./payload_dumper/
+        run: pip install git+https://github.com/5ec1cff/payload-dumper
 
       - name: Make all scripts executable
         run: chmod +x *.sh

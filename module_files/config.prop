@@ -1,4 +1,7 @@
-# You can set those manually if you don't have phisical volume keys.
+# StockBuild.prop module configuration
+# (Legacy key prefix "pixelprops" kept for backward compatibility)
+#
+# You can set those manually if you don't have physical volume keys.
 #
 # On sensitive key, values when true are basically meant,
 # to set and use the sensitive checks, else when false will ignore the check.

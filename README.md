@@ -1,85 +1,115 @@
 
-# Pixel Prop Builder: Streamlined OTA to Build.prop Conversion
+# StockBuild.prop: OTA to Build.prop Module Builder
 
-Effortlessly extract and manage system properties from Pixel OTA updates with this robust automation suite. Designed for developers and enthusiasts alike, it simplifies the process of accessing and customizing Android build properties.
+Build KernelSU/Magisk modules from OTA images to spoof device properties. Supports both **Pixel devices** (scheduled automatic builds) and **any stock device** (on-demand builds from any OTA URL).
 
-## 🚀 Quick Start
+## Features
+
+- **Pixel Scheduled Builds**: Automatically downloads the latest Pixel OTA images and builds spoofing modules on a monthly schedule.
+- **Stock On-Demand Builds**: Provide any OTA ZIP URL and device codename to build a spoofing module for that device.
+- **Play Integrity Fix (PIF)**: Automatic `pif.json` generation from OTA images.
+- **TrickyStore**: Automatic target package list generation and broken TEE handling.
+- **PIHooks (PropImitationHooks)**: Internal prop spoofing with automatic detection of Play Integrity Fix modules.
+- **Safe Mode**: Prevents accidental modification of critical system settings.
+- **Sensitive Props**: Advanced system property management for strong integrity.
+- **GitHub Actions**: Automated CI/CD with release management and Telegram notifications.
+
+## Quick Start
 
 ### Prerequisites
 
 - **Unix-like environment**: Linux or macOS with Bash.
-- **Core utilities**: Ensure you have the following installed:
-  - `dos2unix`, `aria2`, `zip`, `unzip`, `p7zip`, `curl`
-- **Python ^3.8**:
+- **Core utilities**: `dos2unix`, `aria2`, `zip`, `p7zip`, `curl`
+- **Python >= 3.9**:
+  ```bash
+  sudo apt-get update -y
+  sudo apt-get install python3 python3-pip python3-venv -y
+  ```
 
-    ```bash
-    sudo apt-get update -y
-    sudo apt-get install python3 python3-pip python3-venv -y
-    ```
+### Installation
 
-## Installation
-
-1. **Clone the repository** (including submodules):
+1. **Clone the repository**:
 
    ```bash
-   git clone --recurse https://github.com/Pixel-Props/build.prop && cd build.prop
+   git clone https://github.com/OodavidsinoO/StockBuild.prop && cd StockBuild.prop
    ```
 
-2. **Create and activate a virtual environment** (optional but recommended):
+2. **Create and activate a virtual environment** (recommended):
 
-    ```bash
-    python3 -m venv .venv
-    . .venv/bin/activate
-    ```
+   ```bash
+   python3 -m venv .venv
+   . .venv/bin/activate
+   ```
 
 3. **Install dependencies**:
 
-    ```bash
-    python3 -m pip install payload_dumper --break-system-packages
-    ```
+   ```bash
+   python3 -m pip install git+https://github.com/5ec1cff/payload-dumper
+   ```
 
 ## Usage
 
-1. **Obtain Pixel Images**: Download the desired factory or OTA images from [Google Android Images](https://developers.google.com/android/images) or the [Beta OTA Pages](https://developer.android.com/about/versions/15/download-ota).
-2. **Stay Up-to-Date**:
-    - Fetch the latest OTA images with `./download_latest_ota_build.sh <device_name1> <device_name2> ...` (e.g., `husky`, `felix_beta`, `cheetah`, `akita_beta15`).
-3. **Effortless Extraction**:
-    - Place the downloaded image files within the project's workspace.
-    - Execute `./extract_images.sh` to automatically extract images and their build properties into `result/Codename_ID ...`.
-4. **Effortless Module Integration**:
-    - Execute `./build_module.sh` to automatically combine and build your module from the `result/` dir.
+### Building from a Stock OTA URL (any device)
 
-## ✨ Key Features
+Provide a direct OTA ZIP URL and device codename:
 
-- **Automated OTA Acquisition**: Downloads the latest builds directly from Google's official sources.
-- **Seamless Image Extraction**: Extracts system images from both factory images and OTA updates.
-- **Build Prop Generation**: Automatically generates `build.prop` files from extracted system images.
-- **Magisk Module Features**:
-  - **`service.sh`**:
-    - **Safe Mode**: Prevents accidental modification of critical system settings by comparing module properties with existing system values.
-    - **Integrated [Sensitive Props](https://github.com/Pixel-Props/sensitive-props) Mod Features**: Incorporates all [Sensitive Props](https://github.com/Pixel-Props/sensitive-props) Mod features and disables them if the standalone module is also present, avoiding conflicts.
-    - **PIHooks (PropImitationHooks)**: A powerful internal prop spoofing system that dynamically sets essential properties based on the properties of the **module defined in `MOD_PROP_CONTENT` that is being spoofed**.
-      - **Automatic PIHooks Disable**: PIHooks intelligently disables itself when it detects a properly configured Play Integrity Fix module.
-      - **Selective `build.prop` Integration**: PIHooks utilizes values from your device's actual `build.prop` only when setting specific properties, like the initial SDK version, when those values are considered safe and necessary.
-  - **`action.sh`**:
-    - **PlayIntegrityFix**: Automatically builds the `PIF.json` configuration when using a Beta OTA. Provides options to download pre-built configurations or crawl Google's OTA pages to generate a list of devices for building the configuration.
-    - **TrickyStore**: Automatically builds the target app package list and handles broken TEE status.
-- **GitHub Actions Integration**:
-  - **Scheduled Workflows**: Automate updates, builds, and releases on a schedule.
-  - **Duplicate Release Prevention**: Prevents redundant releases with intelligent checks.
-  - **Telegram Notifications**: Receive timely updates about build processes.
-- **Future Enhancements**:
-  - **[Pixel.Features](https://github.com/Pixel-Props/pixel.features/)**: Add support for building Pixel-specific features (currently includes `sysconfigs`).
+```bash
+./build_from_url.sh <OTA_URL> <device_codename> [device_name]
+```
 
-## 📝 Responsible Usage Guidelines
+Example:
+```bash
+./build_from_url.sh "https://example.com/fuxi-ota.zip" fuxi "Xiaomi 13"
+```
 
-This project is provided for educational and experimental purposes. While designed for efficiency, it's crucial to use this tool responsibly.
+This will:
+1. Download the OTA ZIP
+2. Extract `payload.bin` and dump partition images
+3. Extract build properties
+4. Build a KernelSU/Magisk module in `result/`
 
-- **Code Review**: Thoroughly review and understand the code before deploying it in any environment.
-- **Security Best Practices**: Adhere to industry standards for security and legal compliance.
+### Building from Pixel OTA Images (manual)
 
-The creators of this project are not liable for any misuse or damages resulting from its use.
+1. Download Pixel OTA images automatically:
+   ```bash
+   ./download_latest_ota_build.sh <device_name1> <device_name2> ...
+   ```
+   Examples: `husky`, `felix_beta`, `cheetah`, `akita_beta15`
 
-----------
+2. Extract and build:
+   ```bash
+   ./extract_images.sh
+   ```
 
-Ready to streamline your Android customization workflow? Dive in and unlock the power of automated build.prop extraction! Contributions are welcome to enhance the project's functionality and scope.
+3. Find the module in `result/`
+
+### GitHub Actions
+
+- **Pixel scheduled builds**: Runs automatically on the 7th of each month for 10 Pixel devices.
+- **Stock on-demand builds**: Trigger manually via `Actions > Build from OTA URL`, providing the device codename and OTA URL.
+
+Both workflows upload built modules to GitHub Releases with detailed firmware information.
+
+## Module Features
+
+### service.sh
+- **Safe Mode**: Compares module properties with existing system values to prevent accidental modification.
+- **Sensitive Props**: Advanced property management for strong integrity, with conflict detection for standalone modules.
+- **PIHooks (PropImitationHooks)**: Dynamically sets device properties based on the spoofed module's configuration. Automatically disables when Play Integrity Fix is detected.
+
+### action.sh
+- **PlayIntegrityFix**: Automatically builds `pif.json` from OTA images. Supports downloading pre-built configs or crawling Google's OTA pages.
+- **TrickyStore**: Automatically builds `target.txt` with installed packages and handles broken TEE status.
+
+### post-fs-data.sh
+- Checks module compatibility with Magisk >= 26302 or KernelSU >= 10818.
+- Manages Play Services in Magisk DenyList.
+- Cleans custom ROM properties and resets build fingerprints.
+
+## Credits
+
+Originally forked from [Pixel-Props/build.prop](https://github.com/Pixel-Props/build.prop) by @T3SL4 (Tesla). Extended by @OodavidsinoO with support for building modules from any stock OTA image.
+
+## License
+
+GPL v3 - See [LICENSE.md](LICENSE.md)

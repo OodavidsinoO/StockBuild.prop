@@ -17,7 +17,7 @@ fi
 python3 -m pip -V &>/dev/null || print_message "Could not find pip module in python3, To fix this issue simply aria2c and install https://bootstrap.pypa.io/get-pip.py from python3" error
 
 # Check if payload_dumper is available
-payload_dumper -h &>/dev/null || print_message "Could not find payload_dumper executable. Install it using python3 -m pip install payload_dumper/" error
+payload_dumper -h &>/dev/null || print_message "Could not find payload_dumper executable. Install it using python3 -m pip install git+https://github.com/5ec1cff/payload-dumper" error
 
 # Install imjtool if not already installed
 while [ ! -f "./imjtool" ]; do
