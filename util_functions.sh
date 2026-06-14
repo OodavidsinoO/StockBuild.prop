@@ -309,7 +309,7 @@ add_prop_as_ini() {
   fi
 
   if [ -z "$3" ]; then
-    print_message "No property value provided for $2" error
+    print_message "No property value provided for $2, skipping…" warning
     return 1
   fi
 
@@ -341,11 +341,23 @@ extract_image() {
 
   if [ -f "$1/$2.img" ]; then
     print_message "Extracting \"${1##*/}/$2.img\"" debug
+    img="$1/$2.img"
+    out="$1/extracted/$2"
 
-    7z x "$1/$2.img" -o"$1/extracted/$2" -y &>/dev/null
-    # ImjTool not required since of A13?
-    # ./imjtool "$1/$2.img" extract &>/dev/null
-    # rm -rf extracted
+    # Handle EROFS images (Android 13+, common on OEM devices)
+    if command -v fsck.erofs >/dev/null 2>&1 && fsck.erofs "$img" >/dev/null 2>&1; then
+      fsck.erofs --extract="$out" "$img" 2>/dev/null && return 0
+    fi
+
+    # Convert sparse ext4 to raw for 7z extraction
+    if command -v simg2img >/dev/null 2>&1; then
+      simg2img "$img" "$img.raw" 2>/dev/null && img="$img.raw"
+    fi
+
+    7z x "$img" -o"$out" -y &>/dev/null
+
+    # Clean up temp raw image
+    [ "$img" != "$1/$2.img" ] && rm -f "$img"
   fi
 }
 

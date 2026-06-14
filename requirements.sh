@@ -6,7 +6,7 @@ declare PARTITIONS2EXTRACT=("product" "vendor" "vendor_dlkm" "system" "system_ex
 [[ $(type -t "print_message") != function ]] && . ./util_functions.sh
 
 # Install required packages and libs
-install_packages "zip" "p7zip" "dos2unix" "aria2"
+install_packages "zip" "p7zip" "dos2unix" "aria2" "android-sdk-libsparse-utils" "erofs-utils"
 
 # Check whethever python was installed, TODO: Improve install_packages function.
 if ! command -v python3 >/dev/null 2>&1; then

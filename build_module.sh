@@ -17,11 +17,22 @@ declare EXT_PROP_CONTENT=$(cat -- $EXT_PROP_FILES)
 
 # Save module device information
 device_name=$(grep_prop "ro.product.model" "$EXT_PROP_CONTENT")
+[ -z "$device_name" ] && device_name=$(grep_prop "ro.product.vendor.model" "$EXT_PROP_CONTENT")
 device_build_id=$(grep_prop "ro.build.id" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id=$(grep_prop "ro.product.build.id" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id=$(grep_prop "ro.build.version.incremental" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id="unknown"
 device_codename=$(grep_prop "ro.product.vendor.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.product.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.system.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.build.product" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(basename "$dir")
 device_build_description=$(grep_prop "ro.build.description" "$EXT_PROP_CONTENT")
 device_build_android_version=$(grep_prop "ro.vendor.build.version.release" "$EXT_PROP_CONTENT")
+[ -z "$device_build_android_version" ] && device_build_android_version=$(grep_prop "ro.build.version.release" "$EXT_PROP_CONTENT")
 device_build_security_patch=$(grep_prop "ro.vendor.build.security_patch" "$EXT_PROP_CONTENT")
+[ -z "$device_build_security_patch" ] && device_build_security_patch=$(grep_prop "ro.build.version.security_patch" "$EXT_PROP_CONTENT")
 device_codename=${device_codename^}
 
 # Construct the result base
@@ -30,8 +41,9 @@ mkdir -p "result/$base_name/"
 mkdir -p "result/$base_name/system/product/etc/"
 
 # Copy relevant files
-cp "$dir"/{module,system}.prop "result/$base_name/"
-cp -r "$dir"/system/ "result/$base_name/"
+[ -f "$dir/module.prop" ] && cp "$dir/module.prop" "result/$base_name/"
+[ -f "$dir/system.prop" ] && cp "$dir/system.prop" "result/$base_name/"
+[ -d "$dir/system" ] && cp -r "$dir/system/" "result/$base_name/"
 cp -r ./module_files/* "result/$base_name/"
 
 # Navigate to the module directory

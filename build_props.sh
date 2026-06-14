@@ -22,18 +22,38 @@ module_prop=""
 
 brand_for_attestation="$(grep_prop "ro.product.brand_for_attestation" "$EXT_PROP_CONTENT")"
 [ -z "$brand_for_attestation" ] && brand_for_attestation="$(grep_prop "ro.product.vendor.brand" "$EXT_PROP_CONTENT")"
+[ -z "$brand_for_attestation" ] && brand_for_attestation="$(grep_prop "ro.product.product.brand" "$EXT_PROP_CONTENT")"
+[ -z "$brand_for_attestation" ] && brand_for_attestation="$(grep_prop "ro.product.system.brand" "$EXT_PROP_CONTENT")"
+[ -z "$brand_for_attestation" ] && brand_for_attestation="$(grep_prop "ro.product.odm.brand" "$EXT_PROP_CONTENT")"
+[ -z "$brand_for_attestation" ] && brand_for_attestation="$(grep_prop "ro.product.brand" "$EXT_PROP_CONTENT")"
 
 device_for_attestation="$(grep_prop "ro.product.device_for_attestation" "$EXT_PROP_CONTENT")"
 [ -z "$device_for_attestation" ] && device_for_attestation="$(grep_prop "ro.product.vendor.device" "$EXT_PROP_CONTENT")"
+[ -z "$device_for_attestation" ] && device_for_attestation="$(grep_prop "ro.product.product.device" "$EXT_PROP_CONTENT")"
+[ -z "$device_for_attestation" ] && device_for_attestation="$(grep_prop "ro.product.system.device" "$EXT_PROP_CONTENT")"
+[ -z "$device_for_attestation" ] && device_for_attestation="$(grep_prop "ro.product.odm.device" "$EXT_PROP_CONTENT")"
+[ -z "$device_for_attestation" ] && device_for_attestation="$(grep_prop "ro.product.device" "$EXT_PROP_CONTENT")"
 
 manufacturer_for_attestation="$(grep_prop "ro.product.manufacturer_for_attestation" "$EXT_PROP_CONTENT")"
 [ -z "$manufacturer_for_attestation" ] && manufacturer_for_attestation="$(grep_prop "ro.product.vendor.manufacturer" "$EXT_PROP_CONTENT")"
+[ -z "$manufacturer_for_attestation" ] && manufacturer_for_attestation="$(grep_prop "ro.product.product.manufacturer" "$EXT_PROP_CONTENT")"
+[ -z "$manufacturer_for_attestation" ] && manufacturer_for_attestation="$(grep_prop "ro.product.system.manufacturer" "$EXT_PROP_CONTENT")"
+[ -z "$manufacturer_for_attestation" ] && manufacturer_for_attestation="$(grep_prop "ro.product.odm.manufacturer" "$EXT_PROP_CONTENT")"
+[ -z "$manufacturer_for_attestation" ] && manufacturer_for_attestation="$(grep_prop "ro.product.manufacturer" "$EXT_PROP_CONTENT")"
 
 model_for_attestation="$(grep_prop "ro.product.model_for_attestation" "$EXT_PROP_CONTENT")"
 [ -z "$model_for_attestation" ] && model_for_attestation="$(grep_prop "ro.product.vendor.model" "$EXT_PROP_CONTENT")"
+[ -z "$model_for_attestation" ] && model_for_attestation="$(grep_prop "ro.product.product.model" "$EXT_PROP_CONTENT")"
+[ -z "$model_for_attestation" ] && model_for_attestation="$(grep_prop "ro.product.system.model" "$EXT_PROP_CONTENT")"
+[ -z "$model_for_attestation" ] && model_for_attestation="$(grep_prop "ro.product.odm.model" "$EXT_PROP_CONTENT")"
+[ -z "$model_for_attestation" ] && model_for_attestation="$(grep_prop "ro.product.model" "$EXT_PROP_CONTENT")"
 
 name_for_attestation="$(grep_prop "ro.product.name_for_attestation" "$EXT_PROP_CONTENT")"
 [ -z "$name_for_attestation" ] && name_for_attestation="$(grep_prop "ro.product.vendor.name" "$EXT_PROP_CONTENT")"
+[ -z "$name_for_attestation" ] && name_for_attestation="$(grep_prop "ro.product.product.name" "$EXT_PROP_CONTENT")"
+[ -z "$name_for_attestation" ] && name_for_attestation="$(grep_prop "ro.product.system.name" "$EXT_PROP_CONTENT")"
+[ -z "$name_for_attestation" ] && name_for_attestation="$(grep_prop "ro.product.odm.name" "$EXT_PROP_CONTENT")"
+[ -z "$name_for_attestation" ] && name_for_attestation="$(grep_prop "ro.product.name" "$EXT_PROP_CONTENT")"
 
 # Build our system.prop
 to_system_prop "##
@@ -386,11 +406,23 @@ echo -n "${system_prop::-1}" >"$dir/system.prop"
 # Module Props
 ###
 device_name=$model_for_attestation
+[ -z "$device_name" ] && device_name="$device_codename"
+[ -z "$device_name" ] && device_name="${name_for_attestation}"
 device_build_description=$(grep_prop "ro.build.description" "$EXT_PROP_CONTENT")
 device_codename=$(grep_prop "ro.product.vendor.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.product.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.system.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.product.name" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(grep_prop "ro.build.product" "$EXT_PROP_CONTENT")
+[ -z "$device_codename" ] && device_codename=$(basename "$dir")
 device_build_security_patch=$(grep_prop "ro.vendor.build.security_patch" "$EXT_PROP_CONTENT")
+[ -z "$device_build_security_patch" ] && device_build_security_patch=$(grep_prop "ro.build.version.security_patch" "$EXT_PROP_CONTENT")
+[ -z "$device_build_security_patch" ] && device_build_security_patch="unknown"
 device_build_fingerprint=$(grep_prop "ro.product.build.id" "$EXT_PROP_CONTENT")
 device_build_id=$(grep_prop "ro.build.id" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id=$(grep_prop "ro.product.build.id" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id=$(grep_prop "ro.build.version.incremental" "$EXT_PROP_CONTENT")
+[ -z "$device_build_id" ] && device_build_id="unknown"
 base_name="${device_codename}_$device_build_id"
 
 add_prop_as_ini to_module_prop "id" "${device_codename^}_Props"

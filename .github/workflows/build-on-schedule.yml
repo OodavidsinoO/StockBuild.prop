@@ -44,7 +44,7 @@ jobs:
 
       - name: Install APT packages
         run: |
-          sudo apt install -y dos2unix
+          sudo apt install -y dos2unix android-sdk-libsparse-utils erofs-utils
 
       - name: Activate venv
         run: |

@@ -66,6 +66,6 @@ pip install git+https://github.com/5ec1cff/payload-dumper    # Python >= 3.9
 
 ## CI gotchas
 
-- Both workflows need `sudo apt install -y dos2unix` explicitly; other deps are handled by `requirements.sh` at script runtime.
+- Both workflows need `sudo apt install -y dos2unix android-sdk-libsparse-utils` explicitly; other deps are handled by `requirements.sh` at script runtime. `simg2img` (from `android-sdk-libsparse-utils`) is required to convert sparse ext4 partition images from non-Pixel OEM OTAs.
 - The Pixel workflow uses **deprecated actions** (`actions/create-release@v1`, `actions/upload-release-asset@v1`) — do not copy this pattern to new workflows. Use `gh release create` instead.
 - Telegram notifications require `secrets.BOT_TOKEN` and `secrets.CHANNEL_ID`.
